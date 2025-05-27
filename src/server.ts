@@ -3,10 +3,13 @@ import morgan from 'morgan'
 import taskRouter from './routes/taskRouter'
 import dotenv from 'dotenv'
 import { globalErrorHandler } from './middlewares/error'
+import connectDB from './config/db'
 
 dotenv.config()
 
 const app = express()
+
+connectDB(process.env.MONGO_URI as string)
 
 app.use(express.json())
 
