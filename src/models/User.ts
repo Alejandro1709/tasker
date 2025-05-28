@@ -1,11 +1,13 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
+import type { ITask } from './Task'
 
 export interface IUser extends mongoose.Document {
   name: string
   email: string
   password: string
   role: string
+  tasks: ITask[]
   comparePasswords: (
     enteredPassword: string,
     hashedPassword: string
@@ -37,6 +39,12 @@ const userSchema = new mongoose.Schema<IUser>(
       enum: ['user', 'admin'],
       default: 'user',
     },
+    tasks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Task',
+      },
+    ],
   },
   {
     timestamps: true,

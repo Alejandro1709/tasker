@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express'
 import Task from '../models/Task'
 import { createTaskSchema } from '../schemas/task.schema'
 import catchAsync from '../utils/catchAsync'
+import User from '../models/User'
+import AppError from '../utils/AppError'
 
 export const getTasks = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -27,7 +29,17 @@ export const createTask = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const body = createTaskSchema.parse(req.body)
 
-    const task = await Task.create(body)
+    const user = await User.findById(req.user?.id)
+
+    if (!user) {
+      return next(new AppError('User not found', 404))
+    }
+
+    const task = await Task.create({ ...body, user: user.id })
+
+    user.tasks.push(task)
+
+    await user.save()
 
     res.status(201).json(task)
   }
@@ -59,6 +71,18 @@ export const deleteTask = catchAsync(
     if (!task) {
       return next(new Error('This task doesnt exists'))
     }
+
+    const user = await User.findById(req.user?.id)
+
+    if (!user) {
+      return next(new AppError('User not found', 404))
+    }
+
+    const taskIndex = user.tasks.indexOf(task.id)
+
+    user.tasks.splice(taskIndex, 1)
+
+    await user.save()
 
     await task.deleteOne()
 

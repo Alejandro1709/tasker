@@ -1,9 +1,11 @@
 import mongoose from 'mongoose'
+import type { IUser } from './User'
 
 export interface ITask extends mongoose.Document {
   content: string
   completed?: boolean
   completedAt: Date
+  user: IUser
 }
 
 const taskSchema = new mongoose.Schema<ITask>(
@@ -20,6 +22,10 @@ const taskSchema = new mongoose.Schema<ITask>(
     },
     completedAt: {
       type: Date,
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
   },
   {
