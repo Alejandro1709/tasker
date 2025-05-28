@@ -65,3 +65,25 @@ export const deleteTask = catchAsync(
     res.status(204).json({ message: 'Ok' })
   }
 )
+
+export const completeTask = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const task = await Task.findById(req.params.id)
+
+    if (!task) {
+      return next(new Error('This task doesnt exists'))
+    }
+
+    const body = {
+      completed: true,
+      completedAt: new Date(),
+    }
+
+    await task.updateOne(body, {
+      runValidators: false,
+      new: true,
+    })
+
+    res.status(200).json({ message: 'Task completed!' })
+  }
+)
