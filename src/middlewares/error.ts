@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express'
 import * as z from 'zod'
+import AppError from '../utils/AppError'
 
 const handleZodError = (res: Response, err: z.ZodError) => {
   const errors = err.issues.map((issue) => ({
@@ -7,7 +8,13 @@ const handleZodError = (res: Response, err: z.ZodError) => {
     message: issue.message,
   }))
 
-  return res.status(400).json({ message: errors })
+  return res.status(400).json({ status: 'fail', message: errors })
+}
+
+const handleAppError = (res: Response, err: AppError) => {
+  return res
+    .status(err.statusCode)
+    .json({ status: err.status, message: err.message })
 }
 
 export const globalErrorHandler: ErrorRequestHandler = (
@@ -23,5 +30,10 @@ export const globalErrorHandler: ErrorRequestHandler = (
     return
   }
 
-  res.status(500).json({ message: 'Internal Server Error' })
+  if (err instanceof AppError) {
+    handleAppError(res, err)
+    return
+  }
+
+  res.status(500).json({ status: 'error', message: 'Internal Server Error' })
 }
