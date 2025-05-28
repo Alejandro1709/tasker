@@ -1,21 +1,67 @@
 import { NextFunction, Request, Response } from 'express'
+import Task from '../models/Task'
+import { createTaskSchema } from '../schemas/task.schema'
+import catchAsync from '../utils/catchAsync'
 
-export const getTasks = (req: Request, res: Response, next: NextFunction) => {
-  res.status(200).json({ message: 'Ok' })
-}
+export const getTasks = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const tasks = await Task.find()
 
-export const getTask = (req: Request, res: Response, next: NextFunction) => {
-  res.status(200).json({ message: 'Ok' })
-}
+    res.status(200).json(tasks)
+  }
+)
 
-export const createTask = (req: Request, res: Response, next: NextFunction) => {
-  res.status(201).json({ message: 'Ok' })
-}
+export const getTask = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const task = await Task.findById(req.params.id)
 
-export const updateTask = (req: Request, res: Response, next: NextFunction) => {
-  res.status(200).json({ message: 'Ok' })
-}
+    if (!task) {
+      return next(new Error('This task doesnt exists'))
+    }
 
-export const deleteTask = (req: Request, res: Response, next: NextFunction) => {
-  res.status(200).json({ message: 'Ok' })
-}
+    res.status(200).json(task)
+  }
+)
+
+export const createTask = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const body = createTaskSchema.parse(req.body)
+
+    const task = await Task.create(body)
+
+    res.status(201).json(task)
+  }
+)
+
+export const updateTask = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const body = createTaskSchema.parse(req.body)
+
+    const task = await Task.findById(req.params.id)
+
+    if (!task) {
+      return next(new Error('This task doesnt exists'))
+    }
+
+    await task.updateOne(body, {
+      runValidators: true,
+      new: true,
+    })
+
+    res.status(200).json(task)
+  }
+)
+
+export const deleteTask = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const task = await Task.findById(req.params.id)
+
+    if (!task) {
+      return next(new Error('This task doesnt exists'))
+    }
+
+    await task.deleteOne()
+
+    res.status(204).json({ message: 'Ok' })
+  }
+)
