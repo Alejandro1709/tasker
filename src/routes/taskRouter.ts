@@ -7,13 +7,18 @@ import {
   getTasks,
   updateTask,
 } from '../controllers/taskController'
+import { protect } from '../middlewares/auth'
 
 const router = Router()
 
-router.route('/').get(getTasks).post(createTask)
+router.route('/').get(protect, getTasks).post(protect, createTask)
 
-router.route('/:id').get(getTask).put(updateTask).delete(deleteTask)
+router
+  .route('/:id')
+  .get(protect, getTask)
+  .put(protect, updateTask)
+  .delete(protect, deleteTask)
 
-router.put('/:id/complete', completeTask)
+router.put('/:id/complete', protect, completeTask)
 
 export default router
