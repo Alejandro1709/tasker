@@ -76,7 +76,7 @@ export const completeTask = catchAsync(
 
     const body = {
       completed: true,
-      completedAt: new Date(),
+      completedAt: Date.now(),
     }
 
     await task.updateOne(body, {
