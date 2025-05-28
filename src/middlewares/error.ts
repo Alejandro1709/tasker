@@ -23,7 +23,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log(err)
+  // console.log(err)
 
   if (err instanceof z.ZodError) {
     handleZodError(res, err)

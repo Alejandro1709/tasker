@@ -9,3 +9,12 @@ export const createUserSchema = z.object({
 })
 
 export type CreateUserInput = z.infer<typeof createUserSchema>
+
+export const loginUserSchema = z.object({
+  email: z
+    .string({ message: 'Provide your email' })
+    .email({ message: 'Provide a valid email' }),
+  password: z.string({ message: 'Provide a password' }),
+})
+
+export type LoginUserInput = z.infer<typeof loginUserSchema>
