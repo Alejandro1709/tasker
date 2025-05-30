@@ -7,7 +7,7 @@ import AppError from '../utils/AppError'
 
 export const getTasks = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const tasks = await Task.find()
+    const tasks = await Task.find({ user: req.user?.id })
 
     res.status(200).json(tasks)
   }

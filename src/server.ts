@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 import { globalErrorHandler } from './middlewares/error'
 import connectDB from './config/db'
 import AppError from './utils/AppError'
+import cors from 'cors'
 
 dotenv.config()
 
@@ -14,6 +15,7 @@ const app = express()
 connectDB(process.env.MONGO_URI as string)
 
 app.use(express.json())
+app.use(cors())
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
